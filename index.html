@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forest Study Room</title>
+<style>
+:root{--bg:#e6eed6;--card:#fbf8ee;--ink:#2d3b27;--mute:#6b7a5e;--green:#4f7a3a;--green2:#8fb56a;--wood:#b88a58;--wood2:#8a6340;--line:#d3dcc0;--board:#2f4a35;--hi:#f0c75e;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141c12;--card:#1f2a1c;--ink:#e6eed9;--mute:#9fb08c;--green:#8fb56a;--green2:#5b8a45;--wood:#8a6540;--wood2:#5f4529;--line:#324030;--board:#1b2e20;--hi:#d9b04a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141c12;--card:#1f2a1c;--ink:#e6eed9;--mute:#9fb08c;--green:#8fb56a;--green2:#5b8a45;--wood:#8a6540;--wood2:#5f4529;--line:#324030;--board:#1b2e20;--hi:#d9b04a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+header{padding:18px 16px 6px;max-width:1100px;margin:0 auto}
+h1{margin:0;font-size:1.5rem}.sub{color:var(--mute);font-size:.85rem}
+.wrap{display:flex;flex-wrap:wrap;gap:16px;padding:12px 16px 32px;max-width:1100px;margin:0 auto}
+.room{flex:1 1 520px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;position:relative}
+.board{background:var(--board);color:#f3efdc;text-align:center;border:5px solid var(--wood2);border-radius:10px;padding:10px;font-size:1.05rem;letter-spacing:.1em;margin-bottom:14px}
+.deco{display:flex;justify-content:space-between;font-size:1.4rem;margin-bottom:8px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.seat{font:inherit;color:inherit;background:var(--wood);border:2px solid var(--wood2);border-radius:12px;padding:8px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0;min-width:0}
+.seat:hover{transform:translateY(-2px)}
+.seat .face{font-size:2rem;line-height:1.2}.seat .tm{font-variant-numeric:tabular-nums;font-size:.85rem;font-weight:600;min-height:1.3em;color:#fff7e6}
+.seat .no{font-size:.7rem;color:#fff7e6;opacity:.8}
+.seat:not(.occ){background:transparent;border-style:dashed;border-color:var(--line)}
+.seat:not(.occ) .tm,.seat:not(.occ) .no{color:var(--mute)}
+.seat.mine{border-color:var(--hi);box-shadow:0 0 0 3px var(--hi)}.seat.pend{border-color:var(--green);box-shadow:0 0 0 3px var(--green2)}
+.panel{flex:1 1 320px;max-width:440px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;min-height:300px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{flex:1;font:inherit;padding:6px 0;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;cursor:pointer}
+.tabs button.on{background:var(--green);color:#fff;border-color:var(--green)}
+:root:not([data-theme="light"]) .tabs button.on{color:#10200c}
+h3{margin:0 0 8px;font-size:1rem}.hint{color:var(--mute)}
+label{display:block;font-size:.8rem;color:var(--mute);margin:8px 0 2px}
+input[type=text],textarea,select{width:100%;font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+textarea{min-height:80px;resize:vertical}input[type=range]{width:100%;accent-color:var(--green)}
+.btn{font:inherit;padding:7px 14px;border-radius:999px;border:0;background:var(--green);color:#fff;cursor:pointer;margin:10px 6px 0 0}
+:root:not([data-theme="light"]) .btn{color:#10200c}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.bar{background:var(--line);border-radius:99px;height:8px;overflow:hidden;margin-top:4px}.bar i{display:block;height:100%;background:var(--green2)}
+.big{font-size:1.8rem;font-weight:700;color:var(--green)}
+.row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line)}.row .gr{flex:1;min-width:0}
+.week{display:flex;align-items:flex-end;gap:6px;height:100px;margin:10px 0 2px}.week div{flex:1;text-align:center;font-size:.7rem;color:var(--mute);display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.week i{display:block;background:var(--green2);border-radius:4px 4px 0 0;min-height:2px}
+.week button{flex:1;font:inherit;background:none;border:0;padding:0;color:var(--mute);font-size:.7rem;display:flex;flex-direction:column;justify-content:flex-end;height:100%;cursor:pointer;text-align:center}
+.week button.sel i{background:var(--green)}.week button.sel span:last-child{color:var(--green);font-weight:700}
+.row .gr input[type=text]{margin-bottom:4px}
+.calg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}.calh{text-align:center;font-size:.7rem;color:var(--mute)}
+.cald{font:inherit;font-size:.85rem;aspect-ratio:1;border:1px solid transparent;background:none;color:var(--ink);border-radius:8px;cursor:pointer;position:relative;padding:0}
+.cald:disabled{opacity:.35;cursor:default}.cald.tod{border-color:var(--line)}.cald.sel{background:var(--green);color:#fff}
+:root:not([data-theme="light"]) .cald.sel{color:#10200c}
+.cald i{position:absolute;left:50%;bottom:3px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--green2)}.cald i.un{background:var(--hi)}
+.calnav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px}.calb{font:inherit;border:1px solid var(--line);background:none;color:var(--ink);border-radius:99px;padding:2px 14px;cursor:pointer}
+.note{padding:8px 0;border-bottom:1px dashed var(--line)}.note small{color:var(--mute)}.note p{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+#tip{position:fixed;z-index:9;background:var(--board);color:#f3efdc;border-radius:10px;padding:8px 12px;font-size:.85rem;max-width:240px;pointer-events:none;box-shadow:0 4px 14px #0004}
+#tip .bar{background:#fff3}#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--board);color:#f3efdc;padding:8px 16px;border-radius:99px;z-index:10}
+.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.rsg{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:6px 0}.rseat{padding:6px 2px}.rseat .face{font-size:1.5rem}
+.rc{background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px;font-size:.85rem}.rc.mine{border-color:var(--hi)}.rc .hint{display:block}
+.chatp{margin-top:12px;border:2px solid var(--line);border-radius:12px;padding:10px;background:var(--bg)}
+.msgs{height:200px;overflow:auto;margin:8px 0;display:flex;flex-direction:column;gap:6px}
+.msg{background:var(--card);border-radius:10px;padding:5px 9px;align-self:flex-start;max-width:85%;overflow-wrap:anywhere}.msg.me{align-self:flex-end;background:var(--green2);color:#10200c}.msg small{display:block;opacity:.7;font-size:.7rem}
+.send{display:flex;gap:6px}.send .btn{margin:0}
+.wh{text-align:center;margin:8px 0;padding:8px;border:1px dashed var(--line);border-radius:10px}.wh svg{max-width:220px;width:100%;height:auto;display:block;margin:6px auto}.mem{margin-top:4px;display:flex;align-items:center;flex-wrap:wrap}
+.avg{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 8px}.avb{font-size:1.3rem;border:2px solid transparent;background:none;border-radius:10px;cursor:pointer;padding:2px 5px}.avb.on{border-color:var(--green)}
+@media(max-width:480px){.grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<header><h1>🌲 Forest Study Room</h1><div class="sub" id="status">Connecting to the forest…</div></header>
+<div class="wrap">
+ <section class="room">
+  <div class="deco"><span>🌳🍄</span><span>🪟 🍃 🪟</span><span>🍄🌳</span></div>
+  <div class="board">Today's forest study session · pick an empty seat to sit down</div>
+  <div class="grid" id="grid"></div>
+  <h3 style="margin:18px 0 8px">🏡 Private rooms</h3>
+  <div class="rooms" id="rooms"></div>
+  <div class="chatp" id="chat" hidden><h3 id="ch-t"></h3><div id="wheel" class="wh" hidden><div><b>🎡 Lucky Wheel</b> <span id="wh-c"></span></div><svg id="wh-svg" viewBox="0 0 200 200"></svg><button class="btn" id="wh-b">Spin (−5 coins)</button> <button class="btn alt" id="wh-e">✏️ Customize</button><div id="wh-r" class="hint"></div>
+<div id="wh-ed" hidden style="text-align:left;margin-top:8px"><div class="hint">One item per line: <b>count prize</b>, e.g. <code>3 Bubble tea</code>, <code>2x Gaming</code>, <code>Dessert*3</code> (commas work too; no count = 1 slice; more slices = better odds)</div>
+<textarea id="wh-t" rows="6" style="width:100%;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px;margin-top:6px;box-sizing:border-box"></textarea>
+<div class="hint" id="wh-n"></div><svg id="wh-pv" viewBox="0 0 200 200" style="max-width:150px"></svg>
+<div style="text-align:center"><button class="btn" id="wh-s">Save (syncs to everyone in the room)</button> <button class="btn alt" id="wh-d">Reset to default</button> <button class="btn alt" id="wh-x">Cancel</button></div></div></div><div class="msgs" id="ch-m"></div><div class="send"><input type="text" id="ch-i" maxlength="300" placeholder="Say something…"><button class="btn" id="ch-s">Send</button></div></div>
+ </section>
+ <section class="panel">
+  <div class="tabs" id="tabs"><button data-t="me" class="on">My Seat</button><button data-t="stats">Stats</button><button data-t="board">Leaderboard</button><button data-t="notes">Notes</button></div>
+  <div id="p-me"></div><div id="p-stats" hidden></div><div id="p-board" hidden></div><div id="p-notes" hidden></div>
+ </section>
+</div>
+<div id="tip" hidden></div><div id="toast" hidden></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="config.js"></script>
+<script>
+(()=>{
+ let uid=null,fdb=null,A=null;
+ const IN='width:100%;font:inherit;padding:8px;border:1px solid #d3dcc0;border-radius:8px;margin-top:6px;background:#fff;color:#2d3b27',BT='font:inherit;padding:8px 18px;border:0;border-radius:99px;background:#4f7a3a;color:#fff;cursor:pointer;margin:8px 4px 0';
+ const overlay=h=>{const o=document.createElement("div");o.style.cssText="position:fixed;inset:0;z-index:99;background:#e6eed6f2;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto";
+  o.innerHTML='<div style="background:#fbf8ee;border:2px solid #d3dcc0;border-radius:18px;padding:22px;max-width:340px;width:100%;color:#2d3b27;text-align:center;font:15px system-ui,sans-serif"><div style="font-size:2.4rem">🌲🦊</div><h3 style="margin:6px 0">Welcome to the Forest Study Room</h3>'+h+'</div>';document.body.append(o);return o};
+ const zh=e=>({"auth/invalid-credential":"Wrong email or password","auth/wrong-password":"Wrong email or password","auth/user-not-found":"Wrong email or password","auth/email-already-in-use":"This email is already registered — please sign in","auth/weak-password":"Password must be at least 6 characters","auth/invalid-email":"Invalid email format","auth/unauthorized-domain":"This domain is not yet authorized in Firebase (see SETUP.md)","auth/popup-blocked":"Popup was blocked — allow popups and try again"}[e.code]||e.message);
+ const login=()=>new Promise(res=>{
+  const o=overlay('<div style="color:#6b7a5e;margin-bottom:8px">Sign in once and your study records are saved for good</div><button id="g" style="'+BT+'">Sign in with Google</button><div style="color:#6b7a5e;margin:10px 0 2px;font-size:.85rem">or use email</div><input id="e" type="email" placeholder="Email" style="'+IN+'"><input id="p" type="password" placeholder="Password (min. 6 characters)" style="'+IN+'"><button id="l" style="'+BT+'">Sign in</button><button id="r" style="'+BT+';background:transparent;color:#2d3b27;border:1px solid #d3dcc0">Create account</button><div id="m" style="color:#b3402a;font-size:.85rem;margin-top:8px"></div><div style="color:#6b7a5e;font-size:.75rem;margin-top:8px">Google sign-in doesn&#39;t work inside WeChat — use email, or open this page in your phone&#39;s browser</div>');
+  const q=s=>o.querySelector("#"+s),run=f=>async()=>{q("m").textContent="";try{await f();o.remove();res()}catch(e){if(e.code!=="auth/popup-closed-by-user")q("m").textContent=zh(e)}};
+  q("g").onclick=run(()=>A.signInWithPopup(new firebase.auth.GoogleAuthProvider()));
+  q("l").onclick=run(()=>A.signInWithEmailAndPassword(q("e").value.trim(),q("p").value));
+  q("r").onclick=run(()=>A.createUserWithEmailAndPassword(q("e").value.trim(),q("p").value))});
+ const askName=pre=>new Promise(res=>{const o=overlay('<div style="color:#6b7a5e;margin-bottom:6px">Pick a nickname</div><input id="n" maxlength="16" value="'+pre.replace(/[&<>"]/g,"")+'" placeholder="Nickname" style="'+IN+';text-align:center"><button id="b" style="'+BT+'">Enter the room</button>');
+  const i=o.querySelector("#n"),go=()=>{const v=i.value.trim();if(v){o.remove();res(v)}};o.querySelector("#b").onclick=go;i.onkeydown=e=>{if(e.key==="Enter")go()};i.focus()});
+ const ready=(async()=>{
+  firebase.initializeApp(firebaseConfig);fdb=firebase.firestore();A=firebase.auth();
+  let u=await new Promise(r=>{const un=A.onAuthStateChanged(x=>{un();r(x)})});
+  if(!u){await login();u=A.currentUser}
+  uid=u.uid;const ps=await fdb.doc("profiles/"+uid).get();let n=ps.exists&&ps.data().name;
+  if(!n){n=await askName(u.displayName||"");await fdb.doc("profiles/"+uid).set({name:n})}
+  const mk=(t,f)=>{const b=document.createElement("button");b.textContent=t;b.style.cssText="margin-left:8px;font:inherit;font-size:.8rem;border:1px solid #d3dcc0;background:none;color:inherit;border-radius:99px;padding:1px 10px;cursor:pointer";b.onclick=f;document.querySelector("header .sub").append(b)};
+  window.srName=n;window.srAv=ps.exists&&ps.data().avatar||"";window.srRename=async v=>{await fdb.doc("profiles/"+uid).set({name:v,avatar:window.srAv});window.srName=v};window.srAvatar=async a=>{await fdb.doc("profiles/"+uid).set({name:window.srName,avatar:a});window.srAv=a};
+  mk("Sign out",async()=>{await A.signOut();location.reload()});
+ })();
+ ready.catch(e=>{console.error(e);document.getElementById("status").textContent="Connection failed — check firebaseConfig and Firebase settings ("+(e.message||e)+")"});
+ window.claude={use:async k=>{try{await ready}catch(e){return null}
+  if(k==="db")return{collection:p=>fdb.collection(p),doc:p=>fdb.doc(p),inc:n=>firebase.firestore.FieldValue.increment(n),tx:f=>fdb.runTransaction(f)};
+  if(k==="user")return{id:async()=>uid,profiles:async ids=>{const o={};await Promise.all(ids.map(async i=>{const s=await fdb.doc("profiles/"+i).get();o[i]={name:s.exists?s.data().name:"",avatar:s.exists&&s.data().avatar||""}}));return o}};
+  return null}};
+})();
+</script>
+<script>
+const ANIMALS=["🦊","🐻","🐰","🦉","🐿️","🦌","🦝","🐸","🐼","🐨","🦔","🐱","🐺","🦫"];
+const N=12,BEAT=20000,STALE=150000;
+const $=s=>document.querySelector(s);
+const el=(t,c,...k)=>{const e=document.createElement(t);if(c)e.className=c;for(const x of k)e.append(x);return e};
+const hash=s=>{let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return h};
+const AVS=["🦊","🐻","🐰","🦉","🐿️","🦌","🦝","🐸","🐼","🐨","🦔","🐱","🐺","🐶","🐯","🦁","🐮","🐷","🐵","🐧","🐦","🦆","🦜","🐢","🐙","🐳","🦋","🐝"];
+const animal=id=>avs[id]||ANIMALS[hash(id)%ANIMALS.length];
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const fmt=s=>{s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return(h?h+":":"")+String(m).padStart(h?2:1,"0")+":"+String(x).padStart(2,"0")};
+const cn=s=>{const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?h+" hr "+m+" min":m+" min"};
+const nm=id=>names[id]||"Forest friend";
+const U=v=>(!v||v==="未填写")?"Not set":v;
+let db=null,user=null,me=null,seats={},myLogs=[],boardRows=[],notes=[],names={},avs={},mySeat=null,pending=null,lastBeat=0,startNow=0,tipI=null;
+let todayLog={seconds:0,tasks:[]},todayPub=false,priv={},selDate=null,editId=null,openU={};
+
+function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2200)}
+function bar(p){p=Math.max(0,Math.min(100,+p||0));const i=el("i");i.style.width=p+"%";return el("div","bar",i)}
+function tab(t){document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));["me","stats","board","notes"].forEach(x=>$("#p-"+x).hidden=x!==t)}
+$("#tabs").onclick=e=>{if(e.target.dataset.t)tab(e.target.dataset.t)};
+async function resolve(ids){const need=[...new Set(ids)].filter(i=>i&&!(i in names));if(!need.length||!user)return;need.forEach(i=>names[i]="");try{const ps=await user.profiles(need);need.forEach(i=>{names[i]=ps[i]&&ps[i].name||"";avs[i]=ps[i]&&ps[i].avatar||""});}catch(e){}renderAll()}
+const active=i=>{const s=seats["s"+i];return s&&Date.now()-s.beat<STALE?s:null};
+
+/* room */
+function renderRoom(){const g=$("#grid");g.replaceChildren();
+ for(let i=0;i<N;i++){const s=active(i),mine=s&&s.uid===me;
+  const b=el("button","seat"+(s?" occ":"")+(mine?" mine":"")+(pending===i?" pend":""));
+  const tm=el("div","tm",s?fmt((Date.now()-s.start)/1000):"Empty");if(s)tm.dataset.start=s.start;
+  b.append(el("div","face",s?animal(s.uid):"🪵"),tm,el("div","no","#"+(i+1)));
+  b.onmouseenter=e=>showTip(i,e);b.onmousemove=moveTip;b.onmouseleave=()=>{tipI=null;$("#tip").hidden=true};
+  b.onclick=e=>seatClick(i,e);g.append(b)}}
+function seatClick(i,e){const s=active(i);
+ if(!s){if(!me)return toast("Please sign in before sitting down");if(i>=100&&myRoom!==roomOfSeat(i))return toast("Join this room first, then pick a seat");pending=i;tab("me");renderMe();renderRoom();renderRooms()}
+ else if(s.uid===me)tab("me");else showTip(i,e)}
+function showTip(i,e){tipI=i;fillTip();moveTip(e)}
+function fillTip(){const t=$("#tip"),s=active(tipI);if(!s){t.hidden=true;return}
+ t.replaceChildren(el("b","",animal(s.uid)+" "+nm(s.uid)),el("div","","Studied for "+fmt((Date.now()-s.start)/1000)),el("div","","📚 "+U(s.course)),el("div","","📝 "+U(s.task)+" ("+(+s.pct||0)+"%)"),bar(s.pct));t.hidden=false}
+function moveTip(e){const t=$("#tip");t.style.left=Math.min(e.clientX+14,innerWidth-250)+"px";t.style.top=Math.min(e.clientY+14,innerHeight-140)+"px"}
+
+/* my seat */
+function field(lbl,inp){return el("div","",el("label","",lbl),inp)}
+function txt(id,v,ph){const i=el("input");i.type="text";i.id=id;i.value=v||"";i.placeholder=ph;i.maxLength=60;return i}
+function renderMe(){const p=$("#p-me");p.replaceChildren();
+ if(!me){p.append(el("p","hint","Please sign in to join the study room."));return}
+ if(window.srRename){const ni=txt("nick",window.srName||"","Nickname"),sb=el("button","btn alt","Rename");ni.maxLength=16;sb.style.margin="0 0 0 6px";sb.onclick=async()=>{const v=ni.value.trim().slice(0,16);if(!v)return;try{await window.srRename(v);names[me]=v;renderAll();toast("Nickname updated ✅")}catch(e){toast("Update failed")}};const rw=el("div","row",ni,sb);rw.style.borderBottom="0";p.append(rw);
+ const ag=el("div","avg");AVS.forEach(a=>{const b=el("button","avb"+(animal(me)===a?" on":""),a);b.onclick=async()=>{try{await window.srAvatar(a);avs[me]=a;renderAll();renderMe();toast("Avatar updated")}catch(e){toast("Update failed")}};ag.append(b)});p.append(el("div","hint","Choose an avatar"),ag)}
+ const seated=mySeat!==null,s=seated?seats["s"+mySeat]||{}:{};
+ if(!seated&&pending===null){p.append(el("p","hint","Tap an empty seat in the room to start studying 🌿"),el("p","hint","Hover over someone else's seat to see how long they've studied and what they're working on."));return}
+ p.append(el("h3","",seated?"I'm studying at "+seatLabel(mySeat)+" "+animal(me):"About to sit at "+seatLabel(pending)));contPanel(p);
+ const r=el("input");r.type="range";r.id="f-pct";r.min=0;r.max=100;r.step=5;r.value=s.pct||0;
+ const out=el("b","",r.value+"%");r.oninput=()=>out.textContent=r.value+"%";
+ p.append(field("Course",txt("f-course",s.course,"e.g. CS 240")),field("Task",txt("f-task",s.task,"e.g. Assignment 4, Q2")),el("label","","Progress ",out),r);
+ if(seated){const u=el("button","btn","Update progress"),l=el("button","btn alt","Finish & leave"),nb=el("button","btn alt","New task");u.onclick=updateSeat;l.onclick=leave;nb.onclick=newTask;p.append(u,nb,l)}
+ else{const a=el("button","btn","Sit down & start timer"),c=el("button","btn alt","Cancel");a.onclick=sitDown;c.onclick=()=>{pending=null;renderMe();renderRoom();renderRooms()};p.append(a,c)}}
+const vals=()=>({course:$("#f-course").value.trim(),task:$("#f-task").value.trim(),pct:+$("#f-pct").value});
+let curTid=null,curGid=null,cont=null,cpSel=null;
+const _n=new Date(),calSt={m:new Date(_n.getFullYear(),_n.getMonth(),1)},cpSt={m:new Date(_n.getFullYear(),_n.getMonth(),1)};
+function cal(st,sel,pick,mk,re){const y=st.m.getFullYear(),mo=st.m.getMonth(),w=el("div","cal"),g=el("div","calg");
+ ["Su","Mo","Tu","We","Th","Fr","Sa"].forEach(x=>g.append(el("div","calh",x)));
+ for(let i=new Date(y,mo,1).getDay();i>0;i--)g.append(el("div"));
+ for(let d=1,n=new Date(y,mo+1,0).getDate();d<=n;d++){const k=dkey(new Date(y,mo,d)),i=mk(k),b=el("button","cald"+(k===sel?" sel":"")+(k===today()?" tod":""),String(d));
+  if(i){b.append(el("i",i.un?"un":"ok"));b.title=i.t||""}
+  b.disabled=k>today();b.onclick=()=>pick(k);g.append(b)}
+ const mv=n=>{st.m=new Date(y,mo+n,1);re()},p=el("button","calb","◀"),q=el("button","calb","▶");p.onclick=()=>mv(-1);q.onclick=()=>mv(1);
+ w.append(g,el("div","calnav",p,el("b","",new Date(y,mo,1).toLocaleString("en",{month:"long"})+" "+y),q));return w}
+const tc=s=>s<60?"<1 min":cn(s);
+const tl=x=>{let a=x;if(!Array.isArray(a)){try{a=JSON.parse(a)||[]}catch(e){a=[]}}return a.map((t,i)=>({id:"o"+i,...t}))};
+const doneN=a=>tl(a).filter(t=>t.pct>=100).length;
+function noteTask(v){if(!curTid)curTid=Date.now().toString(36);const k=todayLog.tasks.findIndex(t=>t.id===curTid);const o={id:curTid,gid:(k>=0&&todayLog.tasks[k].gid)||curGid||curTid,course:v.course||"Not set",task:v.task||"Not set",pct:v.pct,secs:k>=0?todayLog.tasks[k].secs||0:0,c:k>=0?todayLog.tasks[k].c||0:0};if(!o.c&&inRoomSeat()&&v.pct>=100&&o.secs>=60){o.c=1;award(1)}if(k<0)todayLog.tasks.push(o);else todayLog.tasks[k]=o}
+const dkey=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+async function saveDay(date,d){const done=d.tasks.filter(t=>t.pct>=100).length,sec=Math.round(d.seconds);
+ await Promise.all([db.collection("data/users/"+me).doc("day_"+date).set({date,seconds:sec,tasks:JSON.stringify(d.tasks),pub:!!d.pub}),
+  db.doc("logs/"+me+"_"+date).set({uid:me,date,seconds:sec,done,total:d.tasks.length,pub:!!d.pub,tasks:d.pub?JSON.stringify(d.tasks):""})])}
+let todayReady=false,lgL=false,prL=false;
+const syncToday=()=>{if(!(lgL&&prL))return;if(!todayReady||mySeat===null){loadToday();todayReady=true}};
+const saveLog=()=>todayReady?saveDay(today(),{seconds:todayLog.seconds,tasks:todayLog.tasks,pub:todayPub}):Promise.resolve();
+function loadToday(){const t=today(),p=priv[t]||myLogs.find(x=>x.date===t);todayLog=p?{seconds:p.seconds||0,tasks:tl(p.tasks)}:{seconds:0,tasks:[]};todayPub=!!(p&&p.pub)}
+function dayOf(d){if(d===today())return{seconds:todayLog.seconds,tasks:todayLog.tasks,pub:todayPub};const p=priv[d]||myLogs.find(x=>x.date===d);return p?{seconds:p.seconds||0,tasks:tl(p.tasks),pub:!!p.pub}:{seconds:0,tasks:[],pub:false}}
+async function editTask(date,id,v){const D=dayOf(date),k=D.tasks.findIndex(t=>t.id===id);if(k<0)return;D.tasks[k]={...D.tasks[k],...v};
+ if(date===today()){if(mySeat!==null&&curTid===id){try{await db.doc("seats/s"+mySeat).set({...(seats["s"+mySeat]||{}),course:v.course,task:v.task,pct:v.pct})}catch(e){}}}
+ else priv[date]={date,seconds:D.seconds,tasks:JSON.stringify(D.tasks),pub:D.pub};
+ editId=null;renderStats(true);
+ try{await saveDay(date,D);toast("Saved ✅")}catch(e){toast("Save failed: "+(e.message||e.code))}}
+function delBtn(date,id){const b=el("button","btn alt","Delete task");b.onclick=()=>{if(b.dataset.s!=="1"){b.dataset.s="1";b.textContent="Tap again to confirm";return}deleteTask(date,id)};return b}
+async function deleteTask(date,id){const D=dayOf(date),k=D.tasks.findIndex(t=>t.id===id);if(k<0)return;D.seconds=Math.max(0,D.seconds-(D.tasks[k].secs||0));D.tasks.splice(k,1);
+ if(date===today()){todayLog.seconds=D.seconds;if(curTid===id)curTid=null}else priv[date]={date,seconds:D.seconds,tasks:JSON.stringify(D.tasks),pub:D.pub};
+ editId=null;renderStats(true);
+ try{await saveDay(date,D);toast("Task deleted")}catch(e){toast("Delete failed: "+(e.message||e.code))}}
+async function setPub(date,v){const D=dayOf(date);D.pub=v;if(date===today())todayPub=v;else priv[date]={date,seconds:D.seconds,tasks:JSON.stringify(D.tasks),pub:v};
+ try{await saveDay(date,D);toast(v?"Shared publicly":"Set to private")}catch(e){toast("Save failed: "+(e.message||e.code))}renderStats(true)}
+const ROOMS=[["r2","2-person room",2],["r4","4-person room",4],["r6","6-person room",6]];
+const roomOfSeat=i=>ROOMS[Math.floor(i/100)-1][0],seatLabel=i=>i<100?"Seat "+(i+1):ROOMS[Math.floor(i/100)-1][1]+" "+"seat "+(i%100+1);
+const inRoomSeat=()=>myRoom&&mySeat!==null&&mySeat>=100&&roomOfSeat(mySeat)===myRoom;
+const DEF_W="20 💪Keep going\n4 🧋Bubble tea\n3 🍰Dessert\n2 🎮Game time\n1 🍽️Group dinner";
+const WC=["#d8e8c2","#f2c9a0","#f4b6c2","#a9c4f5","#f0c75e","#c9b8e8","#9fdcd0","#f5a9a0","#bcd98a","#f7d9a8","#a3d2f0","#e8b4d6"],MAXW=60;
+function parseW(t){const it=[];String(t||"").split(/\n|[,，;；、]/).forEach(l=>{l=l.trim();if(!l)return;let n=1,nm=l,m;
+ if(m=l.match(/^(\d+)\s*[x×*个份格]\s*(.+)$/i)){n=+m[1];nm=m[2]}
+ else if(m=l.match(/^(\d+)\s+(.+)$/)){n=+m[1];nm=m[2]}
+ else if(m=l.match(/^(\d+)([^\d\sA-Za-z].*)$/)){n=+m[1];nm=m[2]}
+ else if(m=l.match(/^(.+?)\s*[x×*]\s*(\d+)$/i)){nm=m[1];n=+m[2]}
+ nm=nm.trim().slice(0,20);if(nm&&n>0)it.push({s:nm,n:Math.min(n,MAXW)})});return it.slice(0,20)}
+const layoutW=it=>{const a=[];it.forEach((x,k)=>{for(let j=0;j<x.n;j++)a.push({k,p:(j+.5)/x.n+k*1e-6})});return a.sort((x,y)=>x.p-y.p).map(x=>x.k)};
+const wheelOf=t=>{let it=parseW(t),lay=layoutW(it);if(lay.length<2||lay.length>MAXW){it=parseW(DEF_W);lay=layoutW(it)}return{it,lay}};
+const wText=it=>it.map(x=>x.n+" "+x.s).join("\n");
+const fitW=(t,max)=>{let w=0,o="";for(const c of t){const cw=c.charCodeAt(0)<0x2e80?.55:1;if(w+cw>max)return o+"…";w+=cw;o+=c}return o};
+function wheelSvg(txt,gid){const{it,lay}=wheelOf(txt),T=lay.length,sa=360/T;let h='<g id="'+gid+'" style="transition:transform 4s cubic-bezier(.15,.7,.2,1);transform-origin:100px 100px">';
+ const P=(a,r)=>[100+r*Math.sin(a*Math.PI/180),100-r*Math.cos(a*Math.PI/180)];
+ const fs=Math.max(3.5,Math.min(9,2*Math.PI*60/T*.7)),mc=Math.max(2,58/fs);
+ lay.forEach((k,i)=>{const[x1,y1]=P(i*sa,95),[x2,y2]=P((i+1)*sa,95),a=i*sa+sa/2,lb=fitW(it[k].s,mc);
+  h+='<path d="M100 100L'+x1+' '+y1+'A95 95 0 0 1 '+x2+' '+y2+'Z" fill="'+WC[k%WC.length]+'" stroke="#fff" stroke-width=".6"/><text x="188" y="100" font-size="'+fs+'" text-anchor="end" dominant-baseline="central" fill="#2d3b27" transform="rotate('+(a-90)+' 100 100)">'+lb.replace(/[&<>]/g,"")+'</text>'});
+ return h+'</g><polygon points="93,1 107,1 100,17" fill="#c0392b"/>'}
+let rmem={},rreq={},rinfo={},rmsgs=[],myRoom=null,mySince=0,unMsg=null,rAcc=0,wrot=0,spinning=false,lastSpin=0,reqShown="";const seenReq=new Set();
+const actM=R=>Object.values(rmem).filter(m=>m.room===R&&Date.now()-m.beat<STALE);
+const ownerOf=R=>{const act=actM(R).sort((a,b)=>a.since-b.since),o=(rinfo[R]||{}).owner;return act.find(m=>m.uid===o)?o:(act[0]||{}).uid};
+const hasCoin=()=>!!(db&&db.inc);
+function renderRooms(){const w=$("#rooms");if(!w)return;w.replaceChildren();
+ ROOMS.forEach(([R,t,cap])=>{const act=actM(R),inMe=myRoom===R,rq=rreq[R+"_"+me],ow=ownerOf(R),c=el("div","rc"+(inMe?" mine":""),el("b","",t+" ("+act.length+"/"+cap+")"));
+  if(hasCoin()&&act.length)c.append(el("span","hint","🪙 "+((rinfo[R]||{}).coins||0)+" coins"));
+  const base=(ROOMS.findIndex(x=>x[0]===R)+1)*100,sg=el("div","rsg");
+  for(let j=0;j<cap;j++){const i=base+j,s=active(i),mine=s&&s.uid===me,b=el("button","seat rseat"+(s?" occ":"")+(mine?" mine":"")+(pending===i?" pend":""));
+   const tm=el("div","tm",s?fmt((Date.now()-s.start)/1000):"Empty");if(s)tm.dataset.start=s.start;
+   b.append(el("div","face",s?animal(s.uid):"🪑"),tm);b.onmouseenter=e=>showTip(i,e);b.onmousemove=moveTip;b.onmouseleave=()=>{tipI=null;$("#tip").hidden=true};b.onclick=e=>seatClick(i,e);sg.append(b)}
+  c.append(sg);
+  if(!act.length)c.append(el("span","hint","Free — join directly"));
+  act.forEach(m=>{const r=el("div","mem",el("span","",animal(m.uid)+" "+nm(m.uid)+(m.uid===ow?" 👑":"")));
+   if(inMe&&me===ow&&m.uid!==me){const b=el("button","btn alt","Make owner");b.style.cssText="margin:0 0 0 6px;padding:1px 8px;font-size:.75rem";b.onclick=()=>db.doc("rooms/"+R).update({owner:m.uid}).then(()=>toast("Owner transferred to "+nm(m.uid))).catch(e=>toast("Failed: "+(e.message||e.code)));r.append(b)}
+   c.append(r)});
+  if(inMe&&me===ow)Object.entries(rreq).filter(([k,q])=>q.room===R&&q.status==="pending"&&Date.now()-q.ts<600000).forEach(([k,q])=>{
+   const y=el("button","btn","Approve"),n=el("button","btn alt","Deny");y.style.cssText=n.style.cssText="margin:0 0 0 4px;padding:1px 8px;font-size:.75rem";
+   y.onclick=()=>db.doc("roomReqs/"+k).set({...q,status:"approved",ts:Date.now()});n.onclick=()=>db.doc("roomReqs/"+k).set({...q,status:"denied",ts:Date.now()});
+   c.append(el("div","mem",el("span","","🙋 "+animal(q.uid)+" "+nm(q.uid)+" wants to join"),y,n))});
+  let b;if(inMe){b=el("button","btn alt","Leave room");b.onclick=leaveRoom}
+  else if(act.length>=cap){b=el("button","btn alt","Full");b.disabled=true}
+  else if(!act.filter(m=>m.uid!==me).length){b=el("button","btn","Join");b.onclick=()=>joinRoom(R)}
+  else if(rq&&rq.status==="approved"&&Date.now()-rq.ts<600000){b=el("button","btn","✅ Approved — tap to enter");b.onclick=()=>joinRoom(R,true)}
+  else if(rq&&rq.status==="pending"&&Date.now()-rq.ts<600000){b=el("button","btn alt","Waiting for the owner…");b.disabled=true}
+  else{b=el("button","btn","Request to join");b.onclick=()=>requestRoom(R)}
+  b.style.margin="8px 0 0";c.append(b);w.append(c)});renderWheel()}
+function renderWheel(){const w=$("#wheel");if(!w)return;w.hidden=!(myRoom&&hasCoin());if(w.hidden)return;const c=(rinfo[myRoom]||{}).coins||0;$("#wh-c").textContent="🪙 "+c+" coins (5 coins = 1 spin)";$("#wh-b").disabled=spinning||c<5;
+ const t=(rinfo[myRoom]||{}).wheelTxt||DEF_W;if(!spinning&&t!==wShown)drawWheel(t)}
+let wShown=null;
+function drawWheel(t){wShown=t;wrot=0;$("#wh-svg").innerHTML=wheelSvg(t,"wh-g")}
+function buildWheel(){drawWheel((rinfo[myRoom]||{}).wheelTxt||DEF_W)}
+function playSpin(l){const t=l.w||DEF_W;if(t!==wShown){drawWheel(t);void $("#wh-g").getBoundingClientRect()}
+ const{it,lay}=wheelOf(t),sa=360/lay.length,nmz=it[lay[l.i%lay.length]].s;
+ spinning=true;wrot=(Math.floor(wrot/360)+6)*360-(l.i*sa+sa/2);$("#wh-g").style.transform="rotate("+wrot+"deg)";renderWheel();
+ setTimeout(()=>{spinning=false;$("#wh-r").textContent="🎉 "+animal(l.by)+" "+nm(l.by)+" won "+nmz+"!";renderWheel()},4200)}
+function checkSpin(){const d=myRoom&&rinfo[myRoom];if(!d||!d.last||d.last.ts<=lastSpin)return;lastSpin=d.last.ts;playSpin(d.last)}
+async function spin(){const R=myRoom;if(!R||spinning||!db.tx)return;const ref=db.doc("rooms/"+R);
+ try{await db.tx(async t=>{const d=(await t.get(ref)).data()||{};if((d.coins||0)<5)throw new Error("Not enough coins (need 5)");t.update(ref,{coins:d.coins-5,last:{i:Math.floor(Math.random()*wheelOf(d.wheelTxt||DEF_W).lay.length),by:me,ts:Date.now(),w:d.wheelTxt||DEF_W}})})}catch(e){toast(e.message||"Spin failed")}}
+function award(n){if(!myRoom||!hasCoin())return;db.doc("rooms/"+myRoom).update({coins:db.inc(n)}).then(()=>toast("🪙 +"+n+" coins")).catch(()=>{})}
+function renderMsgs(){const c=$("#chat");if(!c)return;c.hidden=!myRoom;if(!myRoom)return;const sid=(rinfo[myRoom]||{}).sid,r=ROOMS.find(x=>x[0]===myRoom),m=$("#ch-m");
+ $("#ch-t").textContent=r[1]+" · Chat (messages disappear once everyone leaves)";m.replaceChildren();
+ rmsgs.filter(x=>x.sid===(sid||"")).sort((a,b)=>a.ts-b.ts).forEach(x=>m.append(el("div","msg"+(x.uid===me?" me":""),el("small","",animal(x.uid)+" "+nm(x.uid)),el("div","",x.text))));m.scrollTop=m.scrollHeight}
+function renderReq(){}
+function subMsgs(R){if(unMsg)try{unMsg()}catch(e){}rmsgs=[];unMsg=db.collection("roomMsgs").where("room","==",R).onSnapshot(sn=>{rmsgs=sn.docs.map(d=>({...d.data(),id:d.id}));renderMsgs()},e=>{})}
+let rmLoaded=false;
+function restoreRoom(){if(myRoom)return;const m=Object.values(rmem).find(x=>x.uid===me&&Date.now()-x.beat<STALE);if(!m)return;myRoom=m.room;mySince=m.since||Date.now();subMsgs(m.room)}
+function syncSeat(){const m=Object.entries(seats).find(([k,v])=>v.uid===me&&Date.now()-v.beat<STALE);
+  if(m&&mySeat===null){const si=+m[0].slice(1);
+   if(si>=100&&!myRoom){if(!rmLoaded)return;restoreRoom();if(!myRoom){db.doc("seats/s"+si).delete().catch(()=>{});return}}
+   mySeat=si;lastBeat=Date.now();curTid=m[1].tid||null;renderMe()}
+  else if(mySeat!==null&&!seats["s"+mySeat]&&Date.now()-startNow>8000){mySeat=null;renderMe()}}
+function exitLocal(){myRoom=null;if(unMsg)try{unMsg()}catch(e){}unMsg=null;rmsgs=[];renderRooms();renderMsgs()}
+async function requestRoom(R){if(!me)return toast("Please sign in first");try{await db.doc("roomReqs/"+R+"_"+me).set({room:R,uid:me,ts:Date.now(),status:"pending"});toast("Request sent — waiting for the owner")}catch(e){toast("Request failed: "+(e.message||e.code))}}
+async function joinRoom(R,ok){if(!me)return toast("Please sign in first");const cap=ROOMS.find(r=>r[0]===R)[2],act=actM(R).filter(m=>m.uid!==me);
+ if(act.length>=cap)return toast("Room is full");if(act.length&&!ok)return requestRoom(R);
+ try{if(myRoom&&myRoom!==R)await leaveRoom();
+  if(!act.length)await db.doc("rooms/"+R).set({sid:Date.now().toString(36)+Math.random().toString(36).slice(2,6),owner:me,coins:0},{merge:true});
+  lastSpin=((rinfo[R]||{}).last||{}).ts||0;rAcc=0;mySince=Date.now();
+  await db.doc("roomMembers/"+R+"_"+me).set({room:R,uid:me,since:mySince,beat:mySince});
+  db.doc("roomReqs/"+R+"_"+me).delete().catch(()=>{});
+  myRoom=R;subMsgs(R);renderRooms();renderMsgs();toast("You're in — pick a seat to start studying")}catch(e){toast("Failed to enter: "+(e.message||e.code))}}
+async function leaveRoom(){const R=myRoom;if(!R)return;const rest=actM(R).filter(m=>m.uid!==me).sort((a,b)=>a.since-b.since);
+ try{if(mySeat!==null&&mySeat>=100&&roomOfSeat(mySeat)===R)await leave(true);if(ownerOf(R)===me&&rest.length)await db.doc("rooms/"+R).update({owner:rest[0].uid}).catch(()=>{});
+  await db.doc("roomMembers/"+R+"_"+me).delete();if(!rest.length)await Promise.all(rmsgs.map(m=>db.doc("roomMsgs/"+m.id).delete().catch(()=>{})))}catch(e){}
+ exitLocal();renderMe();renderRoom();toast("Left the room")}
+async function rbeat(){if(!myRoom)return;await db.doc("roomMembers/"+myRoom+"_"+me).set({room:myRoom,uid:me,since:mySince,beat:Date.now()})}
+async function sendMsg(){const i=$("#ch-i"),t=i.value.trim();if(!t||!myRoom)return;i.value="";try{await db.collection("roomMsgs").add({room:myRoom,sid:(rinfo[myRoom]||{}).sid||"",uid:me,text:t.slice(0,300),ts:Date.now()})}catch(e){toast("Failed to send");i.value=t}}
+function reqNotify(){if(!myRoom||ownerOf(myRoom)!==me)return;Object.entries(rreq).forEach(([k,q])=>{if(q.room===myRoom&&q.status==="pending"&&q.uid!==me&&Date.now()-q.ts<600000&&!seenReq.has(k+q.ts)){seenReq.add(k+q.ts);toast("🙋 "+nm(q.uid)+" wants to join your room — approve it in the private rooms section")}})}
+function reqHandle(){const r=Object.values(rreq).find(x=>x.uid===me&&x.status==="denied");if(!r||reqShown===r.room+r.ts)return;reqShown=r.room+r.ts;db.doc("roomReqs/"+r.room+"_"+me).delete().catch(()=>{});toast("The owner denied your request")}
+function applyCont(){if(!cont)return;curGid=cont.gid||cont.id;curTid=cont.date===today()?cont.id:Date.now().toString(36);cont=null}
+function contPanel(p){const lb=el("label",""),cb=el("input"),lst=el("div");cb.type="checkbox";lst.hidden=true;cb.onchange=()=>lst.hidden=!cb.checked;lb.append(cb," Continue an unfinished task (find by date)");p.append(lb,lst);
+ const ds=[...new Set([...Object.keys(priv),...myLogs.map(x=>x.date),today()])].sort(),m={};
+ ds.forEach(d=>dayOf(d).tasks.forEach(t=>{const g=t.gid||d+"|"+t.id;m[g]={...t,g,date:d,tot:(m[g]?m[g].tot:0)+(t.secs||0)}}));
+ const by={};Object.values(m).filter(t=>t.pct<100).forEach(t=>(by[t.date]=by[t.date]||[]).push(t));
+ const draw=()=>{lst.replaceChildren(cal(cpSt,cpSel,k=>{cpSel=k;draw()},k=>by[k]?{un:1,t:by[k].length+" unfinished"}:null,draw));
+  if(!Object.keys(by).length)return lst.append(el("p","hint","No unfinished tasks 🎉"));
+  if(!cpSel)return lst.append(el("p","hint","Tap a date with a dot to pick an unfinished task"));
+  const L=by[cpSel]||[];lst.append(el("div","hint",(cpSel===today()?"Today":cpSel)+" unfinished tasks"));
+  if(!L.length)lst.append(el("p","hint","No unfinished tasks on this day"));
+  L.forEach(t=>{const b=el("button","btn alt",U(t.course)+" · "+U(t.task)+" ("+t.pct+"%, total "+tc(t.tot)+")");b.style.cssText="display:block;width:100%;text-align:left;margin:4px 0"+(cont&&cont.g===t.g?";border-color:var(--green)":"");
+   b.onclick=()=>{cont=t;$("#f-course").value=t.course;$("#f-task").value=t.task;$("#f-pct").value=t.pct;$("#f-pct").oninput();toast(mySeat===null?"Selected — tap “Sit down & start timer” to continue":"Selected — tap “Update progress” to switch to this task");draw()};lst.append(b)})};
+ draw()}
+function newTask(){curTid=Date.now().toString(36);curGid=null;cont=null;$("#f-task").value="";$("#f-pct").value=0;$("#f-pct").oninput();toast("Fill in the new task, then tap “Update progress”")}
+async function sitDown(){const v=vals(),i=pending;if(active(i))return toast("That seat was just taken");if(i>=100&&myRoom!==roomOfSeat(i))return toast("Join this room first");
+ try{if(mySeat!==null)await leave(true);mySeat=i;pending=null;lastBeat=startNow=Date.now();curTid=Date.now().toString(36);curGid=null;applyCont();
+  await db.doc("seats/s"+i).set({uid:me,course:v.course,task:v.task,pct:v.pct,tid:curTid,start:Date.now(),beat:Date.now()});
+  noteTask(v);await saveLog()}catch(e){mySeat=null;toast("Couldn't sit down — please try again")}
+ renderMe();renderAll()}
+async function updateSeat(){const v=vals(),old=seats["s"+mySeat]||{};applyCont();noteTask(v);renderStats();const errs=[];
+ try{await db.doc("seats/s"+mySeat).set({uid:me,course:v.course,task:v.task,pct:v.pct,tid:curTid,start:old.start||startNow,beat:Date.now()})}catch(e){errs.push("Seat: "+(e.message||e.code))}
+ try{await saveLog()}catch(e){errs.push("Log: "+(e.message||e.code))}
+ toast(errs.length?"Failed: "+errs.join("; "):"Updated ✅");renderAll()}
+async function leave(silent){try{await beat();await db.doc("seats/s"+mySeat).delete()}catch(e){}mySeat=null;if(silent!==true){renderMe();renderAll();toast("Good work, see you next time 🌙")}}
+async function beat(){if(mySeat===null||!todayReady)return;const n=Date.now(),s=seats["s"+mySeat];const dl=Math.min(n-lastBeat,60000)/1000;todayLog.seconds+=dl;const ct=todayLog.tasks.find(x=>x.id===curTid);if(ct)ct.secs=(ct.secs||0)+dl;if(inRoomSeat()){rAcc+=dl;while(rAcc>=2400){rAcc-=2400;award(1)}}lastBeat=n;await Promise.allSettled([s?db.doc("seats/s"+mySeat).set({...s,beat:n}):null,saveLog()])}
+
+/* stats / board / notes */
+function renderStats(force){if(editId!==null&&!force)return;const p=$("#p-stats");p.replaceChildren();if(!me)return;
+ const sd=selDate||today(),isT=sd===today(),D=dayOf(sd),done=D.tasks.filter(t=>t.pct>=100).length;
+ p.append(el("h3","",isT?"Today":sd+" (past day)"),el("div","big",cn(D.seconds)),el("div","hint","Tasks done: "+done+" / "+D.tasks.length));
+ if(!isT){const b=el("button","btn alt","Back to today");b.onclick=()=>{selDate=null;editId=null;renderStats(true)};p.append(b)}
+ const lb=el("label",""),cb=el("input");cb.type="checkbox";cb.checked=D.pub;cb.onchange=()=>setPub(sd,cb.checked);lb.append(cb," Share this day's tasks publicly (expandable on the leaderboard)");p.append(lb);
+ if(!D.tasks.length)p.append(el("p","hint","No tasks recorded for this day."));
+ D.tasks.forEach(t=>{
+  if(editId===t.id){const c=txt("e-c",t.course,"Course"),k=txt("e-t",t.task,"Task"),r=el("input");r.type="range";r.min=0;r.max=100;r.step=5;r.value=t.pct;const o=el("b","",r.value+"%");r.oninput=()=>o.textContent=r.value+"%";
+   const s=el("button","btn","Save"),x=el("button","btn alt","Cancel");s.onclick=()=>editTask(sd,t.id,{course:c.value.trim()||"Not set",task:k.value.trim()||"Not set",pct:+r.value});x.onclick=()=>{editId=null;renderStats(true)};
+   p.append(el("div","row",el("div","gr",c,k,r,o,s,x,delBtn(sd,t.id))))}
+  else{const e=el("button","btn alt","Edit");e.style.margin="0";e.onclick=()=>{editId=t.id;renderStats(true)};p.append(el("div","row",el("div","gr",el("div","",U(t.course)+" · "+U(t.task)),el("div","hint","Time spent: "+tc(t.secs||0)),bar(t.pct)),el("b","",t.pct+"%"),e))}});
+ p.append(el("h3","","Calendar (tap a date to see that day's tasks)"),cal(calSt,sd,k=>{selDate=k===today()?null:k;editId=null;renderStats(true)},k=>{const D=dayOf(k);return D.tasks.length||D.seconds?{un:D.tasks.some(t=>t.pct<100),t:cn(D.seconds)+" · done "+D.tasks.filter(t=>t.pct>=100).length+"/"+D.tasks.length}:null},()=>renderStats(true)))}
+function renderBoard(){const p=$("#p-board");p.replaceChildren(el("h3","","🏆 Today's Leaderboard"));
+ const rows=[...boardRows].sort((a,b)=>b.seconds-a.seconds);
+ if(!rows.length)p.append(el("p","hint","Nobody has started studying today."));
+ rows.forEach((r,i)=>{const mine=r.uid===me,d=r.done!=null?r.done:doneN(r.tasks),can=mine||r.pub,open=can&&openU[r.uid],ts=mine?todayLog.tasks:tl(r.tasks);
+  const row=el("div","row",el("span","",["🥇","🥈","🥉"][i]||String(i+1)),el("span","",animal(r.uid)),el("div","gr",nm(r.uid)+(mine?" (you)":""),el("div","hint","Tasks done: "+d+(r.total!=null?" / "+r.total:"")+(can?(open?" · collapse ▲":" · expand ▼"):" · 🔒 private"))),el("b","",cn(r.seconds||0)));
+  if(can){row.style.cursor="pointer";row.onclick=()=>{openU[r.uid]=!openU[r.uid];renderBoard()}}
+  p.append(row);
+  if(open){const dt=el("div","hint");dt.style.padding="4px 0 8px 40px";ts.forEach(t=>dt.append(el("div","",(t.pct>=100?"✅ ":"⏳ ")+U(t.course)+" · "+U(t.task)+" ("+t.pct+"%)"),el("div","","Time spent: "+tc(t.secs||0))));if(!ts.length)dt.append("No tasks recorded");p.append(dt)}})}
+function renderNotes(){const p=$("#p-notes");const keep=$("#n-text")?$("#n-text").value:"",kv=$("#n-vis")?$("#n-vis").value:"public";p.replaceChildren(el("h3","","📖 Today's Notes"));
+ if(!me){p.append(el("p","hint","Sign in to write notes."));return}
+ const t=el("textarea");t.id="n-text";t.value=keep;t.placeholder="What did you learn today?";t.maxLength=1000;
+ const v=el("select");v.id="n-vis";[["public","Visible to everyone"],["private","Only me"]].forEach(([a,b])=>{const o=el("option","",b);o.value=a;v.append(o)});v.value=kv;
+ const s=el("button","btn","Save note");s.onclick=saveNote;p.append(t,v,s);
+ notes.filter(n=>n.vis==="public"||n.uid===me).forEach(n=>{const d=el("div","note",el("small","",animal(n.uid)+" "+nm(n.uid)+" · "+n.date+(n.vis==="private"?" · 🔒 only me":"")),el("p","",n.text));
+  if(n.uid===me&&n.id){const b=el("button","btn alt","Delete");b.style.cssText="margin:4px 0 0;padding:2px 12px;font-size:.8rem";b.onclick=()=>{if(b.dataset.s!=="1"){b.dataset.s="1";b.textContent="Tap again to confirm";return}db.doc("notes/"+n.id).delete().then(()=>toast("Note deleted")).catch(e=>toast("Delete failed: "+(e.message||e.code)))};d.append(b)}
+  p.append(d)})}
+async function saveNote(){const t=$("#n-text").value.trim();if(!t)return;try{await db.collection("notes").add({uid:me,date:today(),text:t,vis:$("#n-vis").value,ts:Date.now()});$("#n-text").value="";toast("Note saved to the forest notebook 🍃")}catch(e){toast("Save failed")}}
+function renderAll(){renderRoom();renderStats();renderBoard();renderNotes();renderRooms();renderMsgs();renderReq();if(tipI!==null)fillTip()}
+
+/* init */
+async function init(){renderMe();renderAll();
+ const c=window.claude;if(!c||!c.use){$("#status").textContent="Page failed to load — please refresh";return}
+ db=await c.use("db");user=await c.use("user");
+ if(!db||!user){$("#status").textContent="Connection failed — please refresh";return}
+ me=await user.id();if(!me){$("#status").textContent="Connection failed — please refresh";return}
+ $("#status").textContent="Everyone is studying quietly · one shared room, live";renderMe();renderAll();
+ const er=e=>{$("#status").textContent="Something went wrong with the connection — please refresh"};
+ db.collection("seats").onSnapshot(sn=>{seats={};sn.docs.forEach(d=>seats[d.id]=d.data());syncSeat();
+  resolve(Object.values(seats).map(v=>v.uid));renderAll()},er);
+ db.collection("logs").where("uid","==",me).onSnapshot(sn=>{myLogs=sn.docs.map(d=>d.data());lgL=true;
+  syncToday();renderStats()},er);
+ db.collection("data/users/"+me).onSnapshot(sn=>{priv={};sn.docs.forEach(d=>{const x=d.data();if(x&&x.date)priv[x.date]=x});prL=true;syncToday();renderStats()},er);
+ db.collection("logs").where("date","==",today()).onSnapshot(sn=>{boardRows=sn.docs.map(d=>d.data());resolve(boardRows.map(r=>r.uid));renderBoard()},er);
+ db.collection("notes").orderBy("ts","desc").limit(60).onSnapshot(sn=>{notes=sn.docs.map(d=>({...d.data(),id:d.id}));resolve(notes.map(n=>n.uid));renderNotes()},er);
+ db.collection("rooms").onSnapshot(sn=>{rinfo={};sn.docs.forEach(d=>rinfo[d.id]=d.data());renderMsgs();renderRooms();checkSpin()},er);
+ db.collection("roomMembers").onSnapshot(sn=>{rmem={};sn.docs.forEach(d=>rmem[d.id]=d.data());rmLoaded=true;restoreRoom();syncSeat();
+  if(myRoom&&!rmem[myRoom+"_"+me]&&Date.now()-mySince>8000)exitLocal();resolve(Object.values(rmem).map(m=>m.uid));renderRooms()},er);
+ db.collection("roomReqs").onSnapshot(sn=>{rreq={};sn.docs.forEach(d=>rreq[d.id]=d.data());resolve(Object.values(rreq).map(r=>r.uid));reqNotify();reqHandle();renderRooms()},er);
+ $("#ch-s").onclick=sendMsg;$("#wh-b").onclick=spin;buildWheel();
+ const wt=$("#wh-t"),wpv=()=>{const it=parseW(wt.value),T=layoutW(it).length;$("#wh-n").textContent=T<2?"At least 2 slices needed":T>MAXW?"Max "+MAXW+" slices, currently "+T:it.length+" prizes, "+T+" slices";$("#wh-s").disabled=T<2||T>MAXW;if(T>=2&&T<=MAXW)$("#wh-pv").innerHTML=wheelSvg(wt.value,"pv-g")};
+ wt.oninput=wpv;
+ $("#wh-e").onclick=()=>{const e=$("#wh-ed");e.hidden=!e.hidden;if(!e.hidden){wt.value=wText(wheelOf((rinfo[myRoom]||{}).wheelTxt||DEF_W).it);wpv()}};
+ $("#wh-x").onclick=()=>{$("#wh-ed").hidden=true};
+ $("#wh-d").onclick=()=>{wt.value=DEF_W;wpv()};
+ $("#wh-s").onclick=async()=>{if(!myRoom)return;const it=parseW(wt.value);try{await db.doc("rooms/"+myRoom).set({wheelTxt:wText(it)},{merge:true});$("#wh-ed").hidden=true;toast("Wheel updated 🎡")}catch(e){toast("Save failed: "+(e.message||e.code))}};
+$("#ch-i").onkeydown=e=>{if(e.key==="Enter")sendMsg()};
+ setInterval(()=>rbeat().catch(()=>{}),BEAT);
+ setInterval(()=>beat().catch(()=>{}),BEAT);
+ let k=0;setInterval(()=>{k++;document.querySelectorAll(".tm[data-start]").forEach(e=>e.textContent=fmt((Date.now()-e.dataset.start)/1000));if(tipI!==null)fillTip();if(k%10===0){renderRoom();renderRooms()}},1000)}
+init();
+</script>
+</body>
+</html>
